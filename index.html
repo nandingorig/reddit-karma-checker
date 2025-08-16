@@ -1,104 +1,188 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Reddit Karma Checker</title>
-<style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Reddit Karma Checker</title>
+  <style>
+    :root {
+      --bg: #0b1220;
+      --panel: #0f172a;
+      --muted: #94a3b8;
+      --text: #e2e8f0;
+      --accent: #22d3ee;
+      --danger: #f87171;
+      --ok: #4ade80;
+      --shadow: rgba(2, 8, 23, .6);
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
     body {
-        font-family: Arial, sans-serif;
-        background-color: #0f172a;
-        color: #f1f5f9;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        min-height: 100vh;
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      background: radial-gradient(1200px 800px at 70% -10%, rgba(34,211,238,.08), transparent),
+                  radial-gradient(900px 600px at 0% 110%, rgba(99,102,241,.08), transparent),
+                  var(--bg);
+      color: var(--text);
+      display: grid;
+      place-items: center;
+      padding: 24px;
     }
     .card {
-        background: #1e293b;
-        padding: 20px;
-        border-radius: 12px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.4);
-        width: 350px;
-        text-align: center;
+      width: 100%;
+      max-width: 720px;
+      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.02));
+      border: 1px solid rgba(148,163,184,.15);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 20px 60px var(--shadow);
+      backdrop-filter: blur(6px);
     }
-    input {
-        padding: 10px;
-        border: none;
-        border-radius: 8px;
-        width: 80%;
-        margin-bottom: 10px;
+    header {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 16px; margin-bottom: 14px;
     }
-    button {
-        padding: 10px;
-        border: none;
-        border-radius: 8px;
-        background: #3b82f6;
-        color: white;
-        cursor: pointer;
-        font-weight: bold;
+    h1 { font-size: 22px; margin: 0; letter-spacing: .2px; }
+    .muted { color: var(--muted); font-size: 14px; }
+
+    form { display: grid; grid-template-columns: 1fr auto; gap: 10px; }
+    .input {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--panel);
+      border: 1px solid rgba(148,163,184,.18);
+      border-radius: 12px; padding: 10px 12px;
     }
-    button:hover {
-        background: #2563eb;
+    .input span { color: var(--muted); }
+    .input input {
+      flex: 1; border: none; outline: none; background: transparent; color: var(--text);
+      font-size: 16px;
     }
-    .result {
-        margin-top: 15px;
-        font-size: 1.1em;
+    .btn {
+      border: none; cursor: pointer; border-radius: 12px; padding: 10px 16px; font-weight: 600;
+      background: linear-gradient(90deg, #06b6d4, #22d3ee);
+      color: #00202a; letter-spacing: .3px; box-shadow: 0 8px 24px rgba(34,211,238,.25);
+      transition: transform .06s ease, filter .2s ease;
     }
-</style>
+    .btn:active { transform: translateY(1px) scale(.99); }
+    .btn[disabled] { filter: grayscale(.7) brightness(.8); cursor: not-allowed; }
+
+    .results {
+      margin-top: 14px; border-top: 1px dashed rgba(148,163,184,.25); padding-top: 14px;
+      display: grid; gap: 12px;
+    }
+    .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    .stat {
+      background: var(--panel); border: 1px solid rgba(148,163,184,.18); border-radius: 12px; padding: 12px;
+    }
+    .stat label { display:block; color: var(--muted); font-size: 12px; }
+    .stat b { font-size: 22px; font-variant-numeric: tabular-nums; }
+
+    .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .pill { font-size: 12px; padding: 6px 10px; border-radius: 999px; border:1px solid rgba(148,163,184,.25); background: rgba(148,163,184,.08); }
+    .error { color: var(--danger); }
+
+    .spinner { width: 18px; height: 18px; border-radius: 50%; border: 2px solid rgba(255,255,255,.3); border-top-color: var(--accent); animation: spin .8s linear infinite; display: inline-block; vertical-align: middle; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
 </head>
 <body>
-<div class="card">
-    <h2>Reddit Karma Checker</h2>
-    <input type="text" id="username" placeholder="Enter Reddit username">
-    <br>
-    <button onclick="checkKarma()">Check Karma</button>
-    <div class="result" id="result"></div>
-</div>
+  <div class="card">
+    <header>
+      <div>
+        <h1>Reddit Karma Checker</h1>
+        <div class="muted">Works on GitHub Pages with a free proxy.</div>
+      </div>
+    </header>
 
-<script>
-async function checkKarma() {
-    const username = document.getElementById("username").value.trim();
-    const resultDiv = document.getElementById("result");
+    <form id="form" autocomplete="off">
+      <div class="input">
+        <span>u/</span>
+        <input id="username" name="username" placeholder="spez" minlength="3" required />
+      </div>
+      <button class="btn" id="checkBtn" type="submit">
+        <span id="checkBtnText">Check karma</span>
+        <span id="checkBtnSpin" class="spinner" style="display:none"></span>
+      </button>
+    </form>
 
-    if (!username) {
-        resultDiv.innerHTML = "⚠️ Please enter a username.";
-        return;
+    <div class="results" id="results" hidden>
+      <div class="row" style="justify-content:space-between">
+        <div id="userHeader" class="row"></div>
+      </div>
+      <div class="grid">
+        <div class="stat"><label>Total karma</label><b id="totalKarma">—</b></div>
+        <div class="stat"><label>Post karma</label><b id="linkKarma">—</b></div>
+        <div class="stat"><label>Comment karma</label><b id="commentKarma">—</b></div>
+      </div>
+      <div class="row">
+        <span id="status" class="muted"></span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+
+    function format(n){
+      return new Intl.NumberFormat(undefined, { maximumFractionDigits: 0 }).format(n);
     }
 
-    const url = `https://www.reddit.com/user/${encodeURIComponent(username)}/about.json`;
-
-    resultDiv.innerHTML = "⏳ Checking...";
-    try {
-        const response = await fetch(url);
-        if (response.status === 404) {
-            resultDiv.innerHTML = "❌ Suspended or deleted.";
-            return;
-        }
-        if (!response.ok) {
-            resultDiv.innerHTML = `⚠️ Error: HTTP ${response.status}`;
-            return;
-        }
-        const json = await response.json();
-        const data = json.data;
-        if (!data) {
-            resultDiv.innerHTML = "⚠️ No data returned.";
-            return;
-        }
-
-        const linkKarma = data.link_karma || 0;
-        const commentKarma = data.comment_karma || 0;
-        const totalKarma = linkKarma + commentKarma;
-
-        resultDiv.innerHTML = `
-            ✅ <b>${data.name}</b><br>
-            Link Karma: ${linkKarma.toLocaleString()}<br>
-            Comment Karma: ${commentKarma.toLocaleString()}<br>
-            <b>Total Karma:</b> ${totalKarma.toLocaleString()}
-        `;
-    } catch (err) {
-        resultDiv.innerHTML = `❌ Error: ${err.message}`;
+    function setLoading(isLoading){
+      $('checkBtn').disabled = isLoading;
+      $('checkBtnText').style.display = isLoading ? 'none' : '';
+      $('checkBtnSpin').style.display = isLoading ? '' : 'none';
     }
-}
-</script>
+
+    async function fetchUser(name){
+      const url = `https://www.reddit.com/user/${encodeURIComponent(name)}/about.json`;
+      const proxiedUrl = "https://api.allorigins.win/raw?url=" + encodeURIComponent(url);
+      const res = await fetch(proxiedUrl);
+      if (!res.ok) throw new Error("Failed to fetch");
+      let json;
+      try {
+        json = await res.json();
+      } catch (e) {
+        throw new Error("Unexpected response (HTML instead of JSON). Try another proxy.");
+      }
+      return json;
+    }
+
+    function renderProfile(data){
+      const d = data.data || {};
+      $('results').hidden = false;
+      const header = $('userHeader');
+      header.innerHTML = `<div><b>u/${d.name}</b><br><span class='muted'>Redditor since ${new Date(d.created_utc*1000).toLocaleDateString()}</span></div>`;
+      $('totalKarma').textContent = format(d.total_karma ?? 0);
+      $('linkKarma').textContent = format(d.link_karma ?? 0);
+      $('commentKarma').textContent = format(d.comment_karma ?? 0);
+      $('status').innerHTML = d.is_suspended ? `<span class='error'>Suspended account</span>` : 'Active account';
+    }
+
+    function renderError(message){
+      $('results').hidden = false;
+      $('userHeader').innerHTML = '';
+      $('totalKarma').textContent = '—';
+      $('linkKarma').textContent = '—';
+      $('commentKarma').textContent = '—';
+      $('status').innerHTML = `<span class="error">${message}</span>`;
+    }
+
+    $('form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const raw = $('username').value.trim();
+      const username = raw.replace(/^u\//i, '');
+      if (!username) return;
+      setLoading(true);
+      try {
+        const json = await fetchUser(username);
+        if (!json || !json.data) throw new Error('Unexpected response.');
+        renderProfile(json);
+      } catch (err) {
+        renderError(err.message || 'Something went wrong.');
+      } finally {
+        setLoading(false);
+      }
+    });
+  </script>
 </body>
 </html>
