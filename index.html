@@ -135,10 +135,15 @@
 
     async function fetchUser(name){
       const url = `https://www.reddit.com/user/${encodeURIComponent(name)}/about.json`;
-      const proxiedUrl = "https://api.allorigins.win/raw?url=" + encodeURIComponent(url);
+      const proxiedUrl = "https://api.allorigins.win/get?url=" + encodeURIComponent(url);
       const res = await fetch(proxiedUrl);
       if (!res.ok) throw new Error("Failed to fetch");
-      return res.json();
+      const text = await res.json();
+      try {
+        return JSON.parse(text.contents);
+      } catch(e){
+        throw new Error("Unexpected token error while parsing.");
+      }
     }
 
     function renderProfile(data){
