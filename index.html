@@ -1,188 +1,187 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Reddit Karma Checker</title>
+  <title>Reddit Karma Checker — Pure HTML/JS</title>
   <style>
-    :root {
-      --bg: #0b1220;
-      --panel: #0f172a;
-      --muted: #94a3b8;
-      --text: #e2e8f0;
-      --accent: #22d3ee;
-      --danger: #f87171;
-      --ok: #4ade80;
-      --shadow: rgba(2, 8, 23, .6);
+    :root{
+      --bg:#0b1020;--panel:#111936;--text:#e7eaf6;--muted:#a8b1d1;--accent:#6ea8fe;--good:#3ddc97;--bad:#ff6b6b;
     }
-    * { box-sizing: border-box; }
-    html, body { height: 100%; }
-    body {
-      margin: 0;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-      background: radial-gradient(1200px 800px at 70% -10%, rgba(34,211,238,.08), transparent),
-                  radial-gradient(900px 600px at 0% 110%, rgba(99,102,241,.08), transparent),
-                  var(--bg);
-      color: var(--text);
-      display: grid;
-      place-items: center;
-      padding: 24px;
-    }
-    .card {
-      width: 100%;
-      max-width: 720px;
-      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.02));
-      border: 1px solid rgba(148,163,184,.15);
-      border-radius: 16px;
-      padding: 20px;
-      box-shadow: 0 20px 60px var(--shadow);
-      backdrop-filter: blur(6px);
-    }
-    header {
-      display: flex; align-items: center; justify-content: space-between;
-      gap: 16px; margin-bottom: 14px;
-    }
-    h1 { font-size: 22px; margin: 0; letter-spacing: .2px; }
-    .muted { color: var(--muted); font-size: 14px; }
-
-    form { display: grid; grid-template-columns: 1fr auto; gap: 10px; }
-    .input {
-      display: flex; align-items: center; gap: 8px;
-      background: var(--panel);
-      border: 1px solid rgba(148,163,184,.18);
-      border-radius: 12px; padding: 10px 12px;
-    }
-    .input span { color: var(--muted); }
-    .input input {
-      flex: 1; border: none; outline: none; background: transparent; color: var(--text);
-      font-size: 16px;
-    }
-    .btn {
-      border: none; cursor: pointer; border-radius: 12px; padding: 10px 16px; font-weight: 600;
-      background: linear-gradient(90deg, #06b6d4, #22d3ee);
-      color: #00202a; letter-spacing: .3px; box-shadow: 0 8px 24px rgba(34,211,238,.25);
-      transition: transform .06s ease, filter .2s ease;
-    }
-    .btn:active { transform: translateY(1px) scale(.99); }
-    .btn[disabled] { filter: grayscale(.7) brightness(.8); cursor: not-allowed; }
-
-    .results {
-      margin-top: 14px; border-top: 1px dashed rgba(148,163,184,.25); padding-top: 14px;
-      display: grid; gap: 12px;
-    }
-    .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
-    .stat {
-      background: var(--panel); border: 1px solid rgba(148,163,184,.18); border-radius: 12px; padding: 12px;
-    }
-    .stat label { display:block; color: var(--muted); font-size: 12px; }
-    .stat b { font-size: 22px; font-variant-numeric: tabular-nums; }
-
-    .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-    .pill { font-size: 12px; padding: 6px 10px; border-radius: 999px; border:1px solid rgba(148,163,184,.25); background: rgba(148,163,184,.08); }
-    .error { color: var(--danger); }
-
-    .spinner { width: 18px; height: 18px; border-radius: 50%; border: 2px solid rgba(255,255,255,.3); border-top-color: var(--accent); animation: spin .8s linear infinite; display: inline-block; vertical-align: middle; }
-    @keyframes spin { to { transform: rotate(360deg); } }
+    *{box-sizing:border-box}
+    body{margin:0;font:16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, "Apple Color Emoji","Segoe UI Emoji"; background:linear-gradient(180deg,#0b1020,#11152a) fixed; color:var(--text)}
+    .wrap{max-width:920px;margin:40px auto;padding:0 16px}
+    .card{background:var(--panel);border:1px solid rgba(255,255,255,.08);border-radius:20px;padding:20px;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+    h1{font-weight:700;font-size:clamp(20px,3.5vw,34px);letter-spacing:.3px;margin:0 0 10px}
+    p.lead{margin:.25rem 0 1rem;color:var(--muted)}
+    form{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0 14px}
+    input[type=text]{flex:1 1 260px;padding:12px 14px;border-radius:14px;border:1px solid rgba(255,255,255,.12);background:#0c1532;color:var(--text)}
+    button{padding:12px 16px;border-radius:14px;border:1px solid rgba(255,255,255,.12);background:var(--accent);color:#081022;font-weight:700;cursor:pointer}
+    button:disabled{opacity:.6;cursor:not-allowed}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+    .stat{background:#0e1630;border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:14px}
+    .stat .label{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.08em}
+    .stat .value{font-weight:800;font-size:26px;margin-top:6px}
+    .row{display:flex;align-items:center;gap:12px}
+    .avatar{width:56px;height:56px;border-radius:12px;object-fit:cover;border:1px solid rgba(255,255,255,.15);background:#091024}
+    .muted{color:var(--muted)}
+    .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace}
+    .hint{font-size:13px;color:var(--muted)}
+    .hr{height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.15),transparent);margin:14px 0}
+    .pill{display:inline-flex;align-items:center;gap:6px;border-radius:12px;padding:6px 10px;background:#0d1736;border:1px solid rgba(255,255,255,.1);font-size:13px}
+    .good{color:var(--good)}.bad{color:var(--bad)}
+    details{background:#0c1430;border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:10px}
+    summary{cursor:pointer}
+    footer{opacity:.8;font-size:13px;margin-top:18px;color:var(--muted)}
+    a{color:var(--accent);text-decoration:none}
+    .error{border-left:4px solid var(--bad);padding:10px 12px;background:rgba(255,107,107,.06);border-radius:10px}
+    .loading{opacity:.8}
   </style>
 </head>
 <body>
-  <div class="card">
-    <header>
-      <div>
-        <h1>Reddit Karma Checker</h1>
-        <div class="muted">Works on GitHub Pages with a free proxy.</div>
-      </div>
-    </header>
+  <div class="wrap">
+    <div class="card">
+      <h1>Reddit Karma Checker <span class="muted mono">(Pure HTML/JS)</span></h1>
+      <p class="lead">Type a username to fetch their public karma totals. Works on GitHub Pages — no server, no API keys.</p>
 
-    <form id="form" autocomplete="off">
-      <div class="input">
-        <span>u/</span>
-        <input id="username" name="username" placeholder="spez" minlength="3" required />
-      </div>
-      <button class="btn" id="checkBtn" type="submit">
-        <span id="checkBtnText">Check karma</span>
-        <span id="checkBtnSpin" class="spinner" style="display:none"></span>
-      </button>
-    </form>
+      <form id="form">
+        <input id="username" type="text" placeholder="Enter Reddit username, e.g. spez" autocomplete="off" required />
+        <button id="go" type="submit">Check Karma</button>
+      </form>
+      <div class="hint">Tip: This uses Reddit's public JSON endpoints (<span class="mono">api.reddit.com</span>). Some data (like subreddit-by-subreddit breakdown) requires OAuth and won't appear here.</div>
 
-    <div class="results" id="results" hidden>
-      <div class="row" style="justify-content:space-between">
-        <div id="userHeader" class="row"></div>
-      </div>
-      <div class="grid">
-        <div class="stat"><label>Total karma</label><b id="totalKarma">—</b></div>
-        <div class="stat"><label>Post karma</label><b id="linkKarma">—</b></div>
-        <div class="stat"><label>Comment karma</label><b id="commentKarma">—</b></div>
-      </div>
-      <div class="row">
-        <span id="status" class="muted"></span>
-      </div>
+      <div id="out"></div>
     </div>
+
+    <footer>
+      Open-source this on GitHub and deploy with <a href="https://pages.github.com/" target="_blank" rel="noopener">GitHub Pages</a>. This page only reads public data and does not automate votes or actions.
+    </footer>
   </div>
 
-  <script>
-    const $ = (id) => document.getElementById(id);
+<script>
+const $ = sel => document.querySelector(sel);
+const out = $('#out');
+const form = $('#form');
+const usernameInput = $('#username');
+const goBtn = $('#go');
 
-    function format(n){
-      return new Intl.NumberFormat(undefined, { maximumFractionDigits: 0 }).format(n);
+const fmt = new Intl.NumberFormat();
+
+function since(ts){
+  if(!ts) return '—';
+  const seconds = Math.floor(Date.now()/1000 - ts);
+  const rtf = new Intl.RelativeTimeFormat(undefined, { numeric: 'auto' });
+  const units = [ ['year',31536000],['month',2592000],['day',86400],['hour',3600],['minute',60],['second',1] ];
+  for(const [unit, s] of units){
+    const v = Math.floor(seconds / s);
+    if(Math.abs(v) >= 1){
+      return rtf.format(-v, unit);
     }
+  }
+  return 'just now';
+}
 
-    function setLoading(isLoading){
-      $('checkBtn').disabled = isLoading;
-      $('checkBtnText').style.display = isLoading ? 'none' : '';
-      $('checkBtnSpin').style.display = isLoading ? '' : 'none';
+function html(strings, ...vals){
+  return strings.reduce((acc, s, i) => acc + s + (vals[i] ?? ''), '');
+}
+
+async function fetchJSON(url){
+  const r = await fetch(url, { headers: { 'Accept': 'application/json' } });
+  if(!r.ok) throw new Error(`HTTP ${r.status} on ${url}`);
+  return r.json();
+}
+
+async function loadUser(name){
+  const base = `https://api.reddit.com/user/${encodeURIComponent(name)}`;
+  // about = totals, created date, avatar
+  const aboutP = fetchJSON(`${base}/about`).catch(e=>{throw e});
+  // overview = last up to 100 items; sum recent scores as a "recent karma" snapshot
+  const overviewP = fetchJSON(`${base}.json?limit=100`).catch(()=>null);
+  const [about, overview] = await Promise.all([aboutP, overviewP]);
+  return { about, overview };
+}
+
+function buildUI(name, data){
+  if(!data || !data.about || !data.about.data){
+    out.innerHTML = `<div class="error">User not found or hidden. Double‑check <span class="mono">u/${name}</span>.</div>`;
+    return;
+  }
+  const d = data.about.data;
+  const icon = (d.snoovatar_img && !d.snoovatar_size) ? d.snoovatar_img : (d.icon_img || '').split('?')[0];
+  const linkKarma = d.link_karma ?? 0;
+  const commentKarma = d.comment_karma ?? 0;
+  const total = (linkKarma + commentKarma) | 0;
+  const created = d.created_utc;
+
+  // compute recent sum of scores from last ~100 items (overview)
+  let recent = 0, postCount=0, commentCount=0;
+  if(data.overview && data.overview.data && Array.isArray(data.overview.data.children)){
+    for(const ch of data.overview.data.children){
+      const kind = ch.kind; const o = ch.data || {};
+      if(typeof o.score === 'number') recent += o.score;
+      if(kind === 't3') postCount++; // link/post
+      else if(kind === 't1') commentCount++;
     }
+  }
 
-    async function fetchUser(name){
-      const url = `https://www.reddit.com/user/${encodeURIComponent(name)}/about.json`;
-      const proxiedUrl = "https://api.allorigins.win/raw?url=" + encodeURIComponent(url);
-      const res = await fetch(proxiedUrl);
-      if (!res.ok) throw new Error("Failed to fetch");
-      let json;
-      try {
-        json = await res.json();
-      } catch (e) {
-        throw new Error("Unexpected response (HTML instead of JSON). Try another proxy.");
-      }
-      return json;
-    }
+  out.innerHTML = html`
+    <div class="row" style="margin-top:14px">
+      <img class="avatar" src="${icon || 'https://styles.redditmedia.com/t5_2x7gj/styles/communityIcon_e5p4s9i6k6t81.png'}" alt="avatar" onerror="this.style.visibility='hidden'"/>
+      <div>
+        <div style="font-size:20px;font-weight:800">u/${name}</div>
+        <div class="muted">Created ${since(created)} · <span class="mono">${new Date(created*1000).toLocaleString()}</span></div>
+      </div>
+    </div>
 
-    function renderProfile(data){
-      const d = data.data || {};
-      $('results').hidden = false;
-      const header = $('userHeader');
-      header.innerHTML = `<div><b>u/${d.name}</b><br><span class='muted'>Redditor since ${new Date(d.created_utc*1000).toLocaleDateString()}</span></div>`;
-      $('totalKarma').textContent = format(d.total_karma ?? 0);
-      $('linkKarma').textContent = format(d.link_karma ?? 0);
-      $('commentKarma').textContent = format(d.comment_karma ?? 0);
-      $('status').innerHTML = d.is_suspended ? `<span class='error'>Suspended account</span>` : 'Active account';
-    }
+    <div class="grid" style="margin-top:14px">
+      <div class="stat"><div class="label">Post Karma</div><div class="value">${fmt.format(linkKarma)}</div></div>
+      <div class="stat"><div class="label">Comment Karma</div><div class="value">${fmt.format(commentKarma)}</div></div>
+      <div class="stat"><div class="label">Total Karma</div><div class="value">${fmt.format(total)}</div></div>
+      <div class="stat"><div class="label">Recent (~last 100 items)</div><div class="value ${recent>=0?'good':'bad'}">${fmt.format(recent)}</div></div>
+    </div>
 
-    function renderError(message){
-      $('results').hidden = false;
-      $('userHeader').innerHTML = '';
-      $('totalKarma').textContent = '—';
-      $('linkKarma').textContent = '—';
-      $('commentKarma').textContent = '—';
-      $('status').innerHTML = `<span class="error">${message}</span>`;
-    }
+    <div class="hr"></div>
 
-    $('form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const raw = $('username').value.trim();
-      const username = raw.replace(/^u\//i, '');
-      if (!username) return;
-      setLoading(true);
-      try {
-        const json = await fetchUser(username);
-        if (!json || !json.data) throw new Error('Unexpected response.');
-        renderProfile(json);
-      } catch (err) {
-        renderError(err.message || 'Something went wrong.');
-      } finally {
-        setLoading(false);
-      }
-    });
-  </script>
+    <details>
+      <summary>Raw data & diagnostics</summary>
+      <div class="grid" style="margin-top:10px">
+        <div class="stat"><div class="label">Items analyzed</div><div class="value">${postCount+commentCount}</div><div class="hint">Posts: ${postCount} · Comments: ${commentCount}</div></div>
+        <div class="stat"><div class="label">Is employee?</div><div class="value">${d.is_employee? 'Yes' : 'No'}</div></div>
+        <div class="stat"><div class="label">Is suspended?</div><div class="value">${d.is_suspended? 'Yes' : 'No'}</div></div>
+        <div class="stat"><div class="label">Verified Email</div><div class="value">${d.has_verified_email? 'Yes' : 'No'}</div></div>
+      </div>
+      <pre class="mono" style="white-space:pre-wrap;background:#0b1230;border-radius:12px;padding:12px;overflow:auto;max-height:320px">${escapeHTML(JSON.stringify(d, null, 2))}</pre>
+    </details>
+
+    <div class="hr"></div>
+    <div class="hint">Note: Totals come from <span class="mono">/user/{name}/about</span>. "Recent" sums scores from up to the last 100 public posts & comments; it is not a full historical total.</div>
+  `;
+}
+
+function escapeHTML(s){
+  return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[c]));
+}
+
+form.addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  const name = usernameInput.value.trim().replace(/^u\//,'');
+  if(!name) return;
+  out.innerHTML = '<div class="loading">Fetching…</div>';
+  goBtn.disabled = true;
+  try{
+    const data = await loadUser(name);
+    buildUI(name, data);
+  }catch(err){
+    console.error(err);
+    out.innerHTML = `<div class="error"><strong>Failed to fetch.</strong><br>${escapeHTML(String(err.message||err))}<br><span class="hint">If this persists, try again later — Reddit may be rate limiting public endpoints.</span></div>`;
+  }finally{
+    goBtn.disabled = false;
+  }
+});
+
+// Demo default
+usernameInput.value = 'spez';
+form.dispatchEvent(new Event('submit'));
+</script>
 </body>
 </html>
